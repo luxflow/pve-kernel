@@ -1,0 +1,12 @@
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+--- a/virt/kvm/kvm_main.c 2016-05-12 10:39:37.540387127 +0200
++++ b/virt/kvm/kvm_main.c 2016-05-04 10:43:38.063996221 +0200
+@@ -71,7 +71,7 @@ static unsigned int halt_poll_ns = KVM_H
+ module_param(halt_poll_ns, uint, S_IRUGO | S_IWUSR);
+
+ /* Default doubles per-vcpu halt_poll_ns. */
+-static unsigned int halt_poll_ns_grow = 2;
++static unsigned int halt_poll_ns_grow = 0;
+ module_param(halt_poll_ns_grow, int, S_IRUGO);
+
+ /* Default resets per-vcpu halt_poll_ns . */

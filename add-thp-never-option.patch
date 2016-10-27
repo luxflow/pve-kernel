@@ -1,0 +1,15 @@
+--- ubuntu-wily/mm/Kconfig.org	2015-09-15 09:46:53.770389180 +0200
++++ ubuntu-wily/mm/Kconfig	2015-09-15 09:48:05.813854679 +0200
+@@ -444,6 +444,12 @@
+ 	  madvise(MADV_HUGEPAGE) but it won't risk to increase the
+ 	  memory footprint of applications without a guaranteed
+ 	  benefit.
++
++	config TRANSPARENT_HUGEPAGE_NEVER
++		bool "never"
++	help
++	  Disable Transparent Hugepage
++
+ endchoice
+ 
+ #

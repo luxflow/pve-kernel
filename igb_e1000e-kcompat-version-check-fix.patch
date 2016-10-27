@@ -1,0 +1,19 @@
+diff --git a/src/kcompat.h.orig b/src/kcompat.h
+index ceabd81..e1fa5ac 100644
+--- a/src/kcompat.h.orig
++++ b/src/kcompat.h
+@@ -4809,14 +4809,6 @@ static inline bool page_is_pfmemalloc(struct page __maybe_unused *page)
+ #endif /* 4.5.0 */
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0))
+-#if !(UBUNTU_VERSION_CODE && UBUNTU_VERSION_CODE >= UBUNTU_VERSION(4,4,0,21))
+-static inline void napi_consume_skb(struct sk_buff *skb,
+-				    int __always_unused budget)
+-{
+-	dev_consume_skb_any(skb);
+-}
+-
+-#endif /* UBUNTU_VERSION(4,4,0,21) */
+ static inline void csum_replace_by_diff(__sum16 *sum, __wsum diff)
+ {
+ 	* sum = csum_fold(csum_add(diff, ~csum_unfold(*sum)));

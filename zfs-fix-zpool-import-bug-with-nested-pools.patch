@@ -1,0 +1,107 @@
+From e02aaf17f15ad274fa1f24c9c826f1477911ea3f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hajo=20M=C3=B6ller?= <dasjoe@users.noreply.github.com>
+Date: Wed, 26 Oct 2016 19:30:43 +0200
+Subject: [PATCH] Fix lookup_bdev() on Ubuntu
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ubuntu added support for checking inode permissions to lookup_bdev() in kernel
+commit 193fb6a2c94fab8eb8ce70a5da4d21c7d4023bee (merged in 4.4.0-6.21).
+Upstream bug: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1636517
+
+This patch adds a test for Ubuntu's variant of lookup_bdev() to configure and
+calls the function in the correct way.
+
+Reviewed-by: Brian Behlendorf <behlendorf1@llnl.gov>
+Signed-off-by: Hajo Möller <dasjoe@gmail.com>
+Closes #5336
+---
+ config/kernel-lookup-bdev.m4  | 22 +++++++++++++++++-----
+ include/linux/blkdev_compat.h | 17 +++++++++++++----
+ module/zfs/zvol.c             |  2 +-
+ 3 files changed, 31 insertions(+), 10 deletions(-)
+
+diff --git a/config/kernel-lookup-bdev.m4 b/config/kernel-lookup-bdev.m4
+index 245f95f..abbf55d 100644
+--- a/config/kernel-lookup-bdev.m4
++++ b/config/kernel-lookup-bdev.m4
+@@ -1,17 +1,29 @@
+ dnl #
+-dnl # 2.6.27 API change
+-dnl # lookup_bdev() was exported.
++dnl # 2.6.27, lookup_bdev() was exported.
++dnl # 4.4.0-6.21 - x.y on Ubuntu, lookup_bdev() takes 2 arguments.
+ dnl #
+ AC_DEFUN([ZFS_AC_KERNEL_LOOKUP_BDEV],
+-	[AC_MSG_CHECKING([whether lookup_bdev() is available])
++	[AC_MSG_CHECKING([whether lookup_bdev() wants 1 arg])
+ 	ZFS_LINUX_TRY_COMPILE_SYMBOL([
+ 		#include <linux/fs.h>
+ 	], [
+ 		lookup_bdev(NULL);
+ 	], [lookup_bdev], [fs/block_dev.c], [
+ 		AC_MSG_RESULT(yes)
+-		AC_DEFINE(HAVE_LOOKUP_BDEV, 1, [lookup_bdev() is available])
++		AC_DEFINE(HAVE_1ARG_LOOKUP_BDEV, 1, [lookup_bdev() wants 1 arg])
+ 	], [
+ 		AC_MSG_RESULT(no)
++		AC_MSG_CHECKING([whether lookup_bdev() wants 2 args])
++		ZFS_LINUX_TRY_COMPILE_SYMBOL([
++			#include <linux/fs.h>
++		], [
++			lookup_bdev(NULL, FMODE_READ);
++		], [lookup_bdev], [fs/block_dev.c], [
++			AC_MSG_RESULT(yes)
++			AC_DEFINE(HAVE_2ARGS_LOOKUP_BDEV, 1,
++			    [lookup_bdev() wants 2 args])
++		], [
++			AC_MSG_RESULT(no)
++		])
+ 	])
+-])
++])
+\ No newline at end of file
+diff --git a/include/linux/blkdev_compat.h b/include/linux/blkdev_compat.h
+index bff93ff..1f90b98 100644
+--- a/include/linux/blkdev_compat.h
++++ b/include/linux/blkdev_compat.h
+@@ -263,12 +263,21 @@ bio_set_flags_failfast(struct block_device *bdev, int *flags)
+ 
+ /*
+  * 2.6.27 API change
+- * The function was exported for use, prior to this it existed by the
++ * The function was exported for use, prior to this it existed but the
+  * symbol was not exported.
++ *
++ * 4.4.0-6.21 API change for Ubuntu
++ * lookup_bdev() gained a second argument, FMODE_*, to check inode permissions.
+  */
+-#ifndef HAVE_LOOKUP_BDEV
+-#define	lookup_bdev(path)		ERR_PTR(-ENOTSUP)
+-#endif
++#ifdef HAVE_1ARG_LOOKUP_BDEV
++#define	vdev_lookup_bdev(path)	lookup_bdev(path)
++#else
++#ifdef HAVE_2ARGS_LOOKUP_BDEV
++#define	vdev_lookup_bdev(path)	lookup_bdev(path, 0)
++#else
++#define	vdev_lookup_bdev(path)	ERR_PTR(-ENOTSUP)
++#endif /* HAVE_2ARGS_LOOKUP_BDEV */
++#endif /* HAVE_1ARG_LOOKUP_BDEV */
+ 
+ /*
+  * 2.6.30 API change
+diff --git a/module/zfs/zvol.c b/module/zfs/zvol.c
+index bf6d59f..72a6bc5 100644
+--- a/module/zfs/zvol.c
++++ b/module/zfs/zvol.c
+@@ -174,7 +174,7 @@ zvol_is_zvol(const char *device)
+ 	struct block_device *bdev;
+ 	unsigned int major;
+ 
+-	bdev = lookup_bdev(device);
++	bdev = vdev_lookup_bdev(device);
+ 	if (IS_ERR(bdev))
+ 		return (B_FALSE);
+ 

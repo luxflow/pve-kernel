@@ -1,0 +1,96 @@
+proxmox-ve (4.3-67) unstable; urgency=medium
+
+  * depend on newest 4.4.21-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 10 Oct 2016 13:58:20 +0200
+
+proxmox-ve (4.3-66) unstable; urgency=medium
+
+  * depend on newest 4.4.19-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 14 Sep 2016 13:23:43 +0200
+
+proxmox-ve (4.2-63) unstable; urgency=medium
+
+  * use /etc/apt/trusted.gpg.d/ mechanism to install trusted apt keys
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 29 Aug 2016 12:08:43 +0200
+
+proxmox-ve (4.2-61) unstable; urgency=medium
+
+  * depend on newest 4.4.16-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 24 Aug 2016 15:11:08 +0200
+
+proxmox-ve (4.2-58) unstable; urgency=medium
+
+  * depend on newest 4.4.13-2-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 15 Jul 2016 06:03:16 +0200
+
+proxmox-ve (4.2-55) unstable; urgency=medium
+
+  * depend on newest 4.4.13-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 25 Jun 2016 11:52:14 +0200
+
+proxmox-ve (4.2-54) unstable; urgency=medium
+
+  * depend on newest 4.4.10-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 10 Jun 2016 20:56:08 +0200
+
+proxmox-ve (4.0-49) unstable; urgency=medium
+
+  * depend on newest 4.4.8-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 09 May 2016 10:29:57 +0200
+
+proxmox-ve (4.0-43) unstable; urgency=medium
+
+  * depend on newest 4.4.6-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 11 Apr 2016 09:35:06 +0200
+
+proxmox-ve (4.0-32) unstable; urgency=medium
+
+  * depend on newest 4.2.8-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 03 Feb 2016 16:15:41 +0100
+
+proxmox-ve (4.0-31) unstable; urgency=medium
+
+  * setup kernel links for installation CD (rescue boot)
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 10 Jan 2016 10:10:37 +0100
+
+proxmox-ve (4.0-29) unstable; urgency=medium
+
+  * depend on newest 4.2.6-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 31 Dec 2015 12:46:00 +0100
+
+proxmox-ve (4.0-8) unstable; urgency=medium
+
+  * depend on newest 4.2.3-2-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 03 Nov 2015 10:40:01 +0100
+
+proxmox-ve (4.0-7) unstable; urgency=medium
+
+  * depend on newest 4.2.3-1-pve kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 18 Oct 2015 10:58:21 +0200
+
+proxmox-ve (4.0-6) unstable; urgency=medium
+
+  * depend on newest 4.1.3 kernel
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 30 Jul 2015 09:17:30 +0200
+
+proxmox-ve (4.0-1) unstable; urgency=medium
+
+  * Proxmox VE package for Debian Jessie
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 28 Feb 2015 17:25:14 +0100
+
