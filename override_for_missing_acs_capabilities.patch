@@ -1,29 +1,9 @@
-diff -rupN linux-3.15.old/Documentation/kernel-parameters.txt linux-3.15/Documentation/kernel-parameters.txt
---- linux-3.15.old/Documentation/kernel-parameters.txt	2014-06-08 15:19:54.000000000 -0300
-+++ linux-3.15/Documentation/kernel-parameters.txt	2014-06-09 18:05:31.744055580 -0300
-@@ -2554,6 +2554,16 @@ bytes respectively. Such letter suffixes
- 		nomsi	Do not use MSI for native PCIe PME signaling (this makes
- 			all PCIe root ports use INTx for all services).
- 
-+	pcie_acs_override =
-+			[PCIE] Override missing PCIe ACS support for:
-+		downstream
-+			All downstream ports - full ACS capabilties
-+		multifunction
-+			All multifunction devices - multifunction ACS subset
-+		id:nnnn:nnnn
-+			Specfic device - full ACS capabilities
-+			Specified as vid:did (vendor/device ID) in hex
-+
- 	pcmv=		[HW,PCMCIA] BadgePAD 4
- 
- 	pd_ignore_unused
-diff -rupN linux-3.15.old/drivers/pci/quirks.c linux-3.15/drivers/pci/quirks.c
---- linux-3.15.old/drivers/pci/quirks.c	2014-06-08 15:19:54.000000000 -0300
-+++ linux-3.15/drivers/pci/quirks.c	2014-06-09 18:06:36.688743183 -0300
-@@ -3384,6 +3384,107 @@ struct pci_dev *pci_get_dma_source(struc
- 	return pci_dev_get(dev);
- }
+diff -rurN a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+--- a/drivers/pci/quirks.c	2016-11-07 23:06:15.000000000 +0900
++++ b/drivers/pci/quirks.c	2016-11-20 13:49:11.156752603 +0900
+@@ -3329,6 +3329,107 @@
+ 			       PCI_DEVICE_ID_INTEL_CACTUS_RIDGE_4C,
+ 			       quirk_apple_poweroff_thunderbolt);
  
 +static bool acs_on_downstream;
 +static bool acs_on_multifunction;
@@ -127,21 +107,21 @@ diff -rupN linux-3.15.old/drivers/pci/quirks.c linux-3.15/drivers/pci/quirks.c
 +}
 +
  /*
-  * AMD has indicated that the devices below do not support peer-to-peer
-  * in any system where they are found in the southbridge with an AMD
-@@ -3483,6 +3584,7 @@ static int pci_quirk_intel_pch_acs(struc
- 	return acs_flags & ~flags ? 0 : 1;
+  * Apple: Wait for the thunderbolt controller to reestablish pci tunnels.
+  *
+@@ -4118,6 +4219,7 @@
+ 	return acs_flags ? 0 : 1;
  }
  
 +
  static const struct pci_dev_acs_enabled {
  	u16 vendor;
  	u16 device;
-@@ -3495,6 +3597,7 @@ static const struct pci_dev_acs_enabled
- 	{ PCI_VENDOR_ID_INTEL, PCI_ANY_ID, pci_quirk_intel_pch_acs },
+@@ -4193,6 +4295,7 @@
+ 	{ PCI_VENDOR_ID_INTEL, PCI_ANY_ID, pci_quirk_intel_spt_pch_acs },
  	{ 0x19a2, 0x710, pci_quirk_mf_endpoint_acs }, /* Emulex BE3-R */
  	{ 0x10df, 0x720, pci_quirk_mf_endpoint_acs }, /* Emulex Skyhawk-R */
 +	{ PCI_ANY_ID, PCI_ANY_ID, pcie_acs_overrides },
+ 	/* Cavium ThunderX */
+ 	{ PCI_VENDOR_ID_CAVIUM, PCI_ANY_ID, pci_quirk_cavium_acs },
  	{ 0 }
- };
- 

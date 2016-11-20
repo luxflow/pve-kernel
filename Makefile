@@ -1,13 +1,13 @@
-RELEASE=4.3
+RELEASE=4.8
 
 # also update proxmox-ve/changelog if you change KERNEL_VER or KREL
-KERNEL_VER=4.4.21
-PKGREL=71
+KERNEL_VER=4.8.1
+PKGREL=72
 # also include firmware of previous version into
 # the fw package:  fwlist-2.6.32-PREV-pve
 KREL=1
 
-KERNEL_SRC=ubuntu-xenial
+KERNEL_SRC=ubuntu-yakkety
 KERNELSRCTAR=${KERNEL_SRC}.tgz
 
 EXTRAVERSION=-${KREL}-pve
@@ -22,7 +22,7 @@ TOP=$(shell pwd)
 
 KERNEL_CFG_ORG=config-${KERNEL_VER}.org
 
-FW_VER=1.1
+FW_VER=1.8
 FW_REL=10
 FW_DEB=pve-firmware_${FW_VER}-${FW_REL}_all.deb
 
@@ -72,7 +72,7 @@ ZFS_MODULES=zfs.ko zavl.ko znvpair.ko zunicode.ko zcommon.ko zpios.ko
 SPL_MODULES=spl.ko splat.ko
 
 # DRBD9
-DRBDVER=9.0.4-1
+DRBDVER=9.0.5-1
 DRBDDIR=drbd-${DRBDVER}
 DRBDSRC=${DRBDDIR}.tar.gz
 DRBD_MODULES=drbd.ko drbd_transport_tcp.ko
@@ -173,7 +173,7 @@ fwlist-${KVNAME}: data
 	./find-firmware.pl data/lib/modules/${KVNAME} >fwlist.tmp
 	mv fwlist.tmp $@
 
-data: .compile_mark igb.ko ixgbe.ko e1000e.ko ${SPL_MODULES} ${ZFS_MODULES} ${DRBD_MODULES}
+data: .compile_mark ${SPL_MODULES} ${ZFS_MODULES} ${DRBD_MODULES}
 	rm -rf data tmp; mkdir -p tmp/lib/modules/${KVNAME}
 	mkdir tmp/boot
 	install -m 644 ${KERNEL_SRC}/.config tmp/boot/config-${KVNAME}
@@ -181,11 +181,11 @@ data: .compile_mark igb.ko ixgbe.ko e1000e.ko ${SPL_MODULES} ${ZFS_MODULES} ${DR
 	install -m 644 ${KERNEL_SRC}/arch/x86_64/boot/bzImage tmp/boot/vmlinuz-${KVNAME}
 	cd ${KERNEL_SRC}; make INSTALL_MOD_PATH=../tmp/ modules_install
 	## install latest ibg driver
-	install -m 644 igb.ko tmp/lib/modules/${KVNAME}/kernel/drivers/net/ethernet/intel/igb/
+	#install -m 644 igb.ko tmp/lib/modules/${KVNAME}/kernel/drivers/net/ethernet/intel/igb/
 	# install latest ixgbe driver
-	install -m 644 ixgbe.ko tmp/lib/modules/${KVNAME}/kernel/drivers/net/ethernet/intel/ixgbe/
+	#install -m 644 ixgbe.ko tmp/lib/modules/${KVNAME}/kernel/drivers/net/ethernet/intel/ixgbe/
 	# install latest e1000e driver
-	install -m 644 e1000e.ko tmp/lib/modules/${KVNAME}/kernel/drivers/net/ethernet/intel/e1000e/
+	#install -m 644 e1000e.ko tmp/lib/modules/${KVNAME}/kernel/drivers/net/ethernet/intel/e1000e/
 	## install hpsa driver
 	#install -m 644 hpsa.ko tmp/lib/modules/${KVNAME}/kernel/drivers/scsi/
 	# install zfs drivers
@@ -253,20 +253,8 @@ ${KERNEL_SRC}/README ${KERNEL_CFG_ORG}: ${KERNELSRCTAR}
 	cat ${KERNEL_SRC}/debian.master/config/config.common.ubuntu ${KERNEL_SRC}/debian.master/config/amd64/config.common.amd64 ${KERNEL_SRC}/debian.master/config/amd64/config.flavour.generic > ${KERNEL_CFG_ORG}
 	cd ${KERNEL_SRC}; patch -p1 <../add-thp-never-option.patch
 	cd ${KERNEL_SRC}; patch -p1 <../bridge-patch.diff
-	#cd ${KERNEL_SRC}; patch -p1 <../bridge-forward-ipv6-neighbor-solicitation.patch
-	#cd ${KERNEL_SRC}; patch -p1 <../add-empty-ndo_poll_controller-to-veth.patch
 	cd ${KERNEL_SRC}; patch -p1 <../override_for_missing_acs_capabilities.patch
-	#cd ${KERNEL_SRC}; patch -p1 <../vhost-net-extend-device-allocation-to-vmalloc.patch
-	cd ${KERNEL_SRC}; patch -p1 <../bug-950-tcp-fix-tcp_mark_head_lost-to-check-skb-len-before-f.patch
-	cd ${KERNEL_SRC}; patch -p1 < ../981-1-PCI-Reverse-standard-ACS-vs-device-specific-ACS-enabling.patch
-	cd ${KERNEL_SRC}; patch -p1 < ../981-2-PCI-Quirk-PCH-root-port-ACS-for-Sunrise-Point.patch
 	cd ${KERNEL_SRC}; patch -p1 < ../kvm-dynamic-halt-polling-disable-default.patch
-	# avoid iAMT watchdog problems (not a real watchdog, because does not reset the host)
-	cd ${KERNEL_SRC}; patch -p1 < ../watchdog_implement-mei-iamt-driver.patch
-	cd ${KERNEL_SRC}; patch -p1 < ../mei_drop-watchdog-code.patch
-	cd ${KERNEL_SRC}; patch -p1 < ../mei_bus-whitelist-watchdog-client.patch
-	#sd: Fix rw_max for devices that report an optimal xfer size
-	cd ${KERNEL_SRC}; patch -p1 < ../sd-fix-rw_max.patch
 	# IPoIB performance regression fix
 	cd ${KERNEL_SRC}; patch -p1 < ../IB-ipoib-move-back-the-IB-LL-address-into-the-hard-header.patch
 	sed -i ${KERNEL_SRC}/Makefile -e 's/^EXTRAVERSION.*$$/EXTRAVERSION=${EXTRAVERSION}/'
@@ -419,7 +407,7 @@ dvb-firmware.git/README:
 linux-firmware.git/WHENCE:
 	git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git linux-firmware.git
 
-${FW_DEB} fw: control.firmware linux-firmware.git/WHENCE dvb-firmware.git/README changelog.firmware fwlist-2.6.18-2-pve fwlist-2.6.24-12-pve fwlist-2.6.32-3-pve fwlist-2.6.32-4-pve fwlist-2.6.32-6-pve fwlist-2.6.32-13-pve fwlist-2.6.32-14-pve fwlist-2.6.32-20-pve fwlist-2.6.32-21-pve fwlist-3.10.0-3-pve fwlist-3.10.0-7-pve fwlist-3.10.0-8-pve fwlist-3.19.8-1-pve fwlist-4.2.8-1-pve fwlist-4.4.13-2-pve fwlist-4.4.16-1-pve fwlist-4.4.21-1-pve fwlist-${KVNAME}
+${FW_DEB} fw: control.firmware linux-firmware.git/WHENCE dvb-firmware.git/README changelog.firmware fwlist-2.6.18-2-pve fwlist-2.6.24-12-pve fwlist-2.6.32-3-pve fwlist-2.6.32-4-pve fwlist-2.6.32-6-pve fwlist-2.6.32-13-pve fwlist-2.6.32-14-pve fwlist-2.6.32-20-pve fwlist-2.6.32-21-pve fwlist-3.10.0-3-pve fwlist-3.10.0-7-pve fwlist-3.10.0-8-pve fwlist-3.19.8-1-pve fwlist-4.2.8-1-pve fwlist-4.4.13-2-pve fwlist-4.4.16-1-pve fwlist-4.4.21-1-pve fwlist-4.8.1-1-pve fwlist-${KVNAME}
 	rm -rf fwdata
 	mkdir -p fwdata/lib/firmware
 	./assemble-firmware.pl fwlist-${KVNAME} fwdata/lib/firmware
@@ -441,6 +429,7 @@ ${FW_DEB} fw: control.firmware linux-firmware.git/WHENCE dvb-firmware.git/README
 	./assemble-firmware.pl fwlist-4.4.13-2-pve fwdata/lib/firmware
 	./assemble-firmware.pl fwlist-4.4.16-1-pve fwdata/lib/firmware
 	./assemble-firmware.pl fwlist-4.4.21-1-pve fwdata/lib/firmware
+	./assemble-firmware.pl fwlist-4.8.1-1-pve fwdata/lib/firmware
 	install -d fwdata/usr/share/doc/pve-firmware
 	cp linux-firmware.git/WHENCE fwdata/usr/share/doc/pve-firmware/README
 	install -d fwdata/usr/share/doc/pve-firmware/licenses
@@ -462,7 +451,7 @@ distclean: clean
 
 .PHONY: clean
 clean:
-	rm -rf *~ .compile_mark watchdog-blacklist.tmp ${KERNEL_CFG_ORG} ${KERNEL_SRC} ${KERNEL_SRC}.tmp ${KERNEL_CFG_ORG} ${KERNEL_SRC}.org orig tmp data proxmox-ve/data *.deb ${headers_tmp} fwdata fwlist.tmp *.ko fwlist-${KVNAME} ${ZFSDIR} ${SPLDIR} ${SPL_MODULES} ${ZFS_MODULES} hpsa.ko ${HPSADIR} ${DRBDDIR} drbd-9.0 ${IGBDIR} igb.ko ${IXGBEDIR} ixgbe.ko ${E1000EDIR} e1000e.ko linux-tools ${LINUX_TOOLS_DEB}
+	rm -rf *~ .compile_mark watchdog-blacklist.tmp ${KERNEL_CFG_ORG} ${KERNEL_SRC} ${KERNEL_SRC}.tmp ${KERNEL_CFG_ORG} ${KERNEL_SRC}.org orig tmp data proxmox-ve/data *.deb ${headers_tmp} fwdata fwlist.tmp *.ko fwlist-${KVNAME} ${ZFSDIR} ${SPLDIR} ${SPL_MODULES} ${ZFS_MODULES} hpsa.ko ${HPSADIR} ${DRBDDIR} drbd-9.0 linux-tools ${LINUX_TOOLS_DEB}
 
 
 

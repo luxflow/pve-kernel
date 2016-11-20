@@ -260,6 +260,27 @@ brcm/brcmfmac4365b-pcie.txt
 brcm/brcmfmac4365b-pcie.bin
 brcm/brcmfmac4350-pcie.txt
 cxgb4/t6fw.bin
+
+i915/kbl_guc_ver9_14.bin
+i915/bxt_guc_ver8_7.bin
+iwlwifi-6000g2b-IWL6000G2B_UCODE_API_MAX.ucode
+iwlwifi-6000-6.ucode
+iwlwifi-7265D-24.ucode
+iwlwifi-3168-24.ucode
+iwlwifi-8265-24.ucode
+iwlwifi-8000C--24.ucode
+iwlwifi-9260-th-a0-lc-a0--24.ucode
+iwlwifi-9260-th-a0-jf-a0--24.ucode
+iwlwifi-9000-pu-a0-lc-a0--24.ucode
+iwlwifi-Qu-a0-jf-b0--24.ucode
+rtlwifi/rtl8723bu_bt.bin
+rtlwifi/rtl8723bu_bt.bin
+ath10k/QCA9887/hw1.0/board-2.bin
+brcm/brcmfmac4356-sdio.bin
+brcm/brcmfmac4366c-pcie.bin
+brcm/brcmfmac4365c-pcie.bin
+brcm/brcmfmac4359-pcie.bin
+ks7010sd.rom
 )) {
     $skip->{$fw} = 1;
 }

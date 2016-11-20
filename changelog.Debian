@@ -1,3 +1,9 @@
+pve-kernel (4.8.1-72) unstable; urgency=medium
+
+  * update to Ubuntu-4.8.0-27.29
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 27 Oct 2016 09:17:26 +0200
+
 pve-kernel (4.4.21-71) unstable; urgency=medium
 
   * fix zpool import hang with vdev on zvol
